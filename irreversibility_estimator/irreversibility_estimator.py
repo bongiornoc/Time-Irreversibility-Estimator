@@ -23,7 +23,7 @@ class IrreversibilityEstimator:
     
     Example:
     ```python
-    from irreversibility_estimator.irreversibility_estimator import IrreversibilityEstimator
+    import irreversibility_estimator as ie
     import numpy as np
 
     # Example forward data (encodings of forward trajectories)
@@ -36,14 +36,14 @@ class IrreversibilityEstimator:
     # This means that features 0 and 1 can interact with each other, and features 2, 3, and 4 can interact with each other.
     interaction_constraints = '[[0, 1], [2, 3, 4]]'
 
-    estimator = IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
+    estimator = ie.IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
     irreversibility_value = estimator.fit_predict(x_forward, x_backward)
 
     print(f"Estimated irreversibility: {irreversibility_value}")
 
     # Example with GroupKFold
     groups = np.random.randint(0, 5, size=x_forward.shape[0])  # Example group indices
-    estimator = IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
+    estimator = ie.IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
     irreversibility_value = estimator.fit_predict(x_forward, x_backward, n_splits=5, groups=groups)
 
     print(f"Estimated irreversibility with GroupKFold: {irreversibility_value}")
@@ -127,7 +127,6 @@ class IrreversibilityEstimator:
             # Warning that use xgboost without early stopping can lead to overfitting, say to specify the test set
             sys.warn('Warning: early stopping rounds not specified. Consider specifying the test set for early stopping.')
 
-        
         return model
     
     def evaluate(self, model, x_forward, x_backward, return_log_diffs=False):
@@ -191,6 +190,7 @@ class IrreversibilityEstimator:
         
         Returns:
         float: Mean irreversibility over all folds.
+        array: Individual log differences of the probabilities, if return_log_diffs is True.
         """
         x_forward, x_backward = self._prepare_data(x_forward, x_backward)
         if groups is not None:
