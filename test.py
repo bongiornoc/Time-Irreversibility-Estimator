@@ -16,3 +16,7 @@ print(estimator.fit_predict(x_forward, return_log_diffs=True))
 
 groups = np.random.randint(0,6,10000)
 print(estimator.fit_predict(x_forward, x_backward, groups=groups))
+
+
+x_forward = np.random.normal(mean,std,size=(1000))
+print(estimator.fit_predict(x_forward))
