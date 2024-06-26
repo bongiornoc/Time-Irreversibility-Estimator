@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.model_selection import KFold, GroupKFold
 import xgboost as xgb
+import sys
 
 class IrreversibilityEstimator:
     """
@@ -16,9 +17,8 @@ class IrreversibilityEstimator:
     random_state (int or None): Seed for random number generator. Default is None.
     
     Methods:
-    - train(self, x_forward, x_backward, train_index,test_index): Trains the model on the training set and returns the trained model.
-    - evaluate(self, model, x_forward, x_backward, test_index, return_log_diffs=False): Evaluates the model on the test set and returns the irreversibility.
-    - train_and_evaluate(self, x_forward, x_backward, train_index, test_index, return_log_diffs=False): Trains the model and evaluates it on the test set for a single fold.
+    - train(self, x_forward_train, x_backward_train, x_forward_test=None, x_backward_test=None): Trains the model on the training set with optional test set early stopping and returns the trained model.
+    - evaluate(self, model, x_forward, x_backward, return_log_diffs=False): Evaluates the model on some data and returns the irreversibility.
     - fit_predict(self, x_forward, x_backward=None,n_splits=5, groups=None, return_log_diffs=False): Performs k-fold or group k-fold cross-validation to estimate irreversibility.
     
     Example:
@@ -121,9 +121,11 @@ class IrreversibilityEstimator:
             model.fit(X_train, y_train, verbose=self.verbose, eval_set=[(X_test, y_test)])
             # if the early stopping rounds are not reached, and the last iteration is equal the number of trees, write a warning
             if model.get_booster().num_boosted_rounds() == self.n_estimators:
-                print('Warning: early stopping rounds not reached. Consider increasing the number of trees.')
+                sys.warn('Warning: early stopping rounds not reached. Consider increasing the number of trees.')
         else:
             model.fit(X_train, y_train, verbose=self.verbose)
+            # Warning that use xgboost without early stopping can lead to overfitting, say to specify the test set
+            sys.warn('Warning: early stopping rounds not specified. Consider specifying the test set for early stopping.')
 
         
         return model
@@ -158,7 +160,7 @@ class IrreversibilityEstimator:
         else:
             return irreversibility
     
-    def train_and_evaluate(self, x_forward, x_backward, train_index, test_index, return_log_diffs=False):
+    def _train_and_evaluate(self, x_forward, x_backward, train_index, test_index, return_log_diffs=False):
         """
         Trains the model and evaluates it on the test set for a single fold.
         
@@ -190,7 +192,7 @@ class IrreversibilityEstimator:
         Returns:
         float: Mean irreversibility over all folds.
         """
-        x_forward, x_backward = self.prepare_data(x_forward, x_backward)
+        x_forward, x_backward = self._prepare_data(x_forward, x_backward)
         if groups is not None:
             kf = GroupKFold(n_splits).split(x_forward, groups=groups)
         else:
@@ -204,9 +206,9 @@ class IrreversibilityEstimator:
             if self.verbose:
                 print(f"Processing fold {fold_idx + 1}/{self.n_splits}")
             if return_log_diffs:
-                D[fold_idx], log_diffs[test_index] = self.train_and_evaluate(x_forward, x_backward, train_index, test_index, return_log_diffs)
+                D[fold_idx], log_diffs[test_index] = self._train_and_evaluate(x_forward, x_backward, train_index, test_index, return_log_diffs)
             else:
-                D[fold_idx] = self.train_and_evaluate(x_forward, x_backward, train_index, test_index)
+                D[fold_idx] = self._train_and_evaluate(x_forward, x_backward, train_index, test_index)
         
         if self.verbose:
             print(f"Completed cross-validation with mean irreversibility: {D.mean()}")
