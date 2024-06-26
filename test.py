@@ -2,7 +2,7 @@
 import irreversibility_estimator as ie
 import numpy as np
 
-estimator = ie.IrreversibilityEstimator
+estimator = ie.IrreversibilityEstimator()
 mean = 0.6
 std = 1
 x_forward = np.random.normal(mean,std,size=(10000,2))

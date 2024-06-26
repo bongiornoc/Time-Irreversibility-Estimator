@@ -115,7 +115,7 @@ class IrreversibilityEstimator:
         )
 
         if self.verbose:
-            print(f"Training model with train size {len(train_index)}")
+            print(f"Training model with train size {len(x_forward_train)}")
 
         if x_forward_test is not None and x_backward_test is not None:
             model.fit(X_train, y_train, verbose=self.verbose, eval_set=[(X_test, y_test)])
@@ -143,7 +143,7 @@ class IrreversibilityEstimator:
         float: Calculated irreversibility for the test set.
         list: Individual log differences of the probabilities, if return_log_diffs is True.
         """
-        y_test = np.r_[np.ones_like(x_forward), np.zeros_like(x_backward)]
+        y_test = np.r_[np.ones(len(x_forward)), np.zeros(len(x_backward))]
         X_test = np.row_stack((x_forward, x_backward))
 
         prob = model.predict_proba(X_test)[:, 1]
