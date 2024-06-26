@@ -185,7 +185,7 @@ class IrreversibilityEstimator:
         x_forward (ndarray): Encodings of the forward trajectories. 2-dimensional numpy array where axis 0 represents different trajectories and axis 1 represents the encoding dimension of each trajectory.
         x_backward (ndarray, optional): Encodings of the backward trajectories. If None, it is computed by reversing x_forward along axis 1. Default is None.
         n_splits (int): Number of folds for cross-validation. Default is 5.
-        groups (array-like, optional): Group labels for the samples used while splitting the dataset into train/test set. Default is None.
+        groups (array-like, optional): Group labels for the samples used while splitting the dataset into train/test set (see sklearn.model_selection.GroupFold). Default is None.
         return_log_diffs (bool): If True, return the individual log differences of the probabilities. Default is False.
         
         Returns:
