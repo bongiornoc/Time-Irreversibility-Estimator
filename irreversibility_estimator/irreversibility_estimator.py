@@ -87,7 +87,7 @@ class IrreversibilityEstimator:
             x_backward = x_forward[:, ::-1]
         return x_forward, x_backward
     
-    def train(self, x_forward, x_backward, train_index):
+    def train(self, x_forward, x_backward, train_index,test_index):
         """
         Trains the model on the training set and returns the trained model.
         
@@ -102,6 +102,9 @@ class IrreversibilityEstimator:
         y_train = np.r_[np.ones_like(train_index), np.zeros_like(train_index)]
         X_train = np.row_stack((x_forward[train_index], x_backward[train_index]))
 
+        y_test = np.r_[np.ones_like(test_index), np.zeros_like(test_index)]
+        X_test = np.row_stack((x_forward[test_index], x_backward[test_index]))
+
         model = xgb.XGBClassifier(
             n_estimators=self.n_estimators,
             max_depth=self.max_depth,
@@ -113,7 +116,7 @@ class IrreversibilityEstimator:
         if self.verbose:
             print(f"Training model with train size {len(train_index)}")
 
-        model.fit(X_train, y_train, verbose=self.verbose)
+        model.fit(X_train, y_train, verbose=self.verbose, eval_set=[(X_test, y_test)])
         
         return model
     
@@ -163,7 +166,7 @@ class IrreversibilityEstimator:
         float: Calculated irreversibility for the fold.
         list: Individual log differences of the probabilities, if return_log_diffs is True.
         """
-        model = self.train(x_forward, x_backward, train_index)
+        model = self.train(x_forward, x_backward, train_index,test_index)
         return self.evaluate(model, x_forward, x_backward, test_index, return_log_diffs)
     
     def fit_predict(self, x_forward, x_backward=None,n_splits=5, groups=None,return_log_diffs=False):
@@ -186,7 +189,7 @@ class IrreversibilityEstimator:
         else:
             kf = KFold(n_splits=n_splits, shuffle=True, random_state=self.random_state).split(x_forward)
         
-        D = np.zeros(self.n_splits)
+        D = np.zeros(n_splits)
         if return_log_diffs:
             log_diffs = np.zeros(len(x_forward))
         
