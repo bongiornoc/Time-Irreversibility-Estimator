@@ -7,7 +7,7 @@ class IrreversibilityEstimator:
     A class to estimate irreversibility in time series using gradient boosting classification.
     
     Attributes:
-    n_splits (int): Number of folds for cross-validation.
+    
     max_depth (int): Maximum depth of the trees in the gradient boosting model.
     n_estimators (int): Number of trees in the gradient boosting model.
     early_stopping_rounds (int): Number of rounds for early stopping.
@@ -21,7 +21,7 @@ class IrreversibilityEstimator:
     - train(self, x_forward, x_backward, train_index): Trains the model on the training set and returns the trained model.
     - evaluate(self, model, x_forward, x_backward, test_index, return_log_diffs=False): Evaluates the model on the test set and returns the irreversibility.
     - train_and_evaluate(self, x_forward, x_backward, train_index, test_index, return_log_diffs=False): Trains the model and evaluates it on the test set for a single fold.
-    - fit_predict(self, x_forward, x_backward=None, groups=None): Performs k-fold or group k-fold cross-validation to estimate irreversibility.
+    - fit_predict(self, x_forward, x_backward=None,n_splits=5, groups=None): Performs k-fold or group k-fold cross-validation to estimate irreversibility.
     
     Example:
     ```python
@@ -45,19 +45,18 @@ class IrreversibilityEstimator:
 
     # Example with GroupKFold
     groups = np.random.randint(0, 5, size=x_forward.shape[0])  # Example group indices
-    estimator = IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0, n_splits=5)
-    irreversibility_value = estimator.fit_predict(x_forward, x_backward, groups=groups)
+    estimator = IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
+    irreversibility_value = estimator.fit_predict(x_forward, x_backward, n_splits=5, groups=groups)
 
     print(f"Estimated irreversibility with GroupKFold: {irreversibility_value}")
     ```
     """
     
-    def __init__(self, n_splits=5, max_depth=6, n_estimators=10000, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None):
+    def __init__(self, max_depth=6, n_estimators=10000, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None):
         """
         Initializes the IrreversibilityEstimator with specified parameters.
         
         Args:
-        n_splits (int): Number of folds for cross-validation. Default is 5.
         max_depth (int): Maximum depth of the trees in the gradient boosting model. Default is 6.
         n_estimators (int): Number of trees in the gradient boosting model. Default is 10000.
         early_stopping_rounds (int): Number of rounds for early stopping. Default is 10.
@@ -65,7 +64,7 @@ class IrreversibilityEstimator:
         interaction_constraints (str, optional): Constraints on interactions between features in the form of a string. For example, '[[0, 1], [2, 3, 4]]' means that features 0 and 1 can interact with each other, and features 2, 3, and 4 can interact with each other. Default is None.
         random_state (int or None): Seed for random number generator. Default is None.
         """
-        self.n_splits = n_splits
+    
         self.max_depth = max_depth
         self.n_estimators = n_estimators
         self.early_stopping_rounds = early_stopping_rounds
@@ -123,7 +122,7 @@ class IrreversibilityEstimator:
         Evaluates the model on the test set and returns the irreversibility.
         
         Args:
-        model (XGBClassifier): Trained XGBoost model.
+        model: Any model compatible with the scikit-learn API.
         x_forward (ndarray): Encodings of the forward trajectories.
         x_backward (ndarray): Encodings of the backward trajectories.
         test_index (ndarray): Indices for the test set.
@@ -167,32 +166,42 @@ class IrreversibilityEstimator:
         model = self.train(x_forward, x_backward, train_index)
         return self.evaluate(model, x_forward, x_backward, test_index, return_log_diffs)
     
-    def fit_predict(self, x_forward, x_backward=None, groups=None):
+    def fit_predict(self, x_forward, x_backward=None,n_splits=5, groups=None,return_log_diffs=False):
         """
         Performs k-fold or group k-fold cross-validation to estimate irreversibility.
         
         Args:
         x_forward (ndarray): Encodings of the forward trajectories.
         x_backward (ndarray, optional): Encodings of the backward trajectories. If None, it is computed by reversing x_forward along axis 1. Default is None.
+        n_splits (int): Number of folds for cross-validation. Default is 5.
         groups (array-like, optional): Group labels for the samples used while splitting the dataset into train/test set. Default is None.
+        return_log_diffs (bool): If True, return the individual log differences of the probabilities. Default is False.
         
         Returns:
         float: Mean irreversibility over all folds.
         """
         x_forward, x_backward = self.prepare_data(x_forward, x_backward)
         if groups is not None:
-            kf = GroupKFold(n_splits=self.n_splits)
+            kf = GroupKFold(n_splits).split(x_forward, groups=groups)
         else:
-            kf = KFold(n_splits=self.n_splits, shuffle=True, random_state=self.random_state)
+            kf = KFold(n_splits=n_splits, shuffle=True, random_state=self.random_state).split(x_forward)
         
         D = np.zeros(self.n_splits)
+        if return_log_diffs:
+            log_diffs = np.zeros(len(x_forward))
         
-        for fold_idx, (train_index, test_index) in enumerate(kf.split(x_forward, groups=groups)):
+        for fold_idx, (train_index, test_index) in enumerate(kf):
             if self.verbose:
                 print(f"Processing fold {fold_idx + 1}/{self.n_splits}")
-            D[fold_idx] = self.train_and_evaluate(x_forward, x_backward, train_index, test_index)
+            if return_log_diffs:
+                D[fold_idx], log_diffs[test_index] = self.train_and_evaluate(x_forward, x_backward, train_index, test_index, return_log_diffs)
+            else:
+                D[fold_idx] = self.train_and_evaluate(x_forward, x_backward, train_index, test_index)
         
         if self.verbose:
             print(f"Completed cross-validation with mean irreversibility: {D.mean()}")
 
-        return D.mean()
+        if return_log_diffs:
+            return D.mean(), log_diffs
+        else:
+            return D.mean()
