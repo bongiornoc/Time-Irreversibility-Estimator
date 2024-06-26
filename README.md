@@ -1,11 +1,9 @@
-Sure, here is a sample `README.md` file for your project:
 
-```markdown
 # Irreversibility Estimator
 
 The `IrreversibilityEstimator` is a Python package designed to estimate irreversibility in time series using gradient boosting classification. This package leverages the power of `xgboost` to classify forward and backward trajectories, providing a measure of irreversibility.
 
-## Features
+## Key Features
 
 - **Cross-Validation:** Utilizes k-fold cross-validation to ensure robust estimation.
 - **Customizable Model:** Allows customization of `xgboost` parameters, including maximum tree depth, number of estimators, and interaction constraints.
@@ -83,6 +81,4 @@ This package uses the following libraries:
 - `numpy`
 - `scikit-learn`
 - `xgboost`
-```
 
-This `README.md` provides a clear overview of the package, its features, installation instructions, usage examples, and other relevant information. Feel free to customize it further to suit your needs.
