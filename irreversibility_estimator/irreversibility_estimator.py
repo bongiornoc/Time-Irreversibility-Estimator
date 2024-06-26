@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, GroupKFold
 import xgboost as xgb
 
 class IrreversibilityEstimator:
@@ -14,14 +14,14 @@ class IrreversibilityEstimator:
     verbose (bool): If True, print progress messages. Default is False.
     interaction_constraints (str): Constraints on interactions between features as a string.
     random_state (int or None): Seed for random number generator. Default is None.
-    kf (KFold): KFold cross-validator.
+    kf (KFold or GroupKFold): KFold or GroupKFold cross-validator.
     
     Methods:
     - prepare_data(self, x_forward, x_backward=None): Prepares the forward and backward datasets.
     - train(self, x_forward, x_backward, train_index): Trains the model on the training set and returns the trained model.
     - evaluate(self, model, x_forward, x_backward, test_index, return_log_diffs=False): Evaluates the model on the test set and returns the irreversibility.
     - train_and_evaluate(self, x_forward, x_backward, train_index, test_index, return_log_diffs=False): Trains the model and evaluates it on the test set for a single fold.
-    - fit_predict(self, x_forward, x_backward=None): Performs k-fold cross-validation to estimate irreversibility.
+    - fit_predict(self, x_forward, x_backward=None, groups=None): Performs k-fold or group k-fold cross-validation to estimate irreversibility.
     
     Example:
     ```python
@@ -42,6 +42,13 @@ class IrreversibilityEstimator:
     irreversibility_value = estimator.fit_predict(x_forward, x_backward)
 
     print(f"Estimated irreversibility: {irreversibility_value}")
+
+    # Example with GroupKFold
+    groups = np.random.randint(0, 5, size=x_forward.shape[0])  # Example group indices
+    estimator = IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0, n_splits=5)
+    irreversibility_value = estimator.fit_predict(x_forward, x_backward, groups=groups)
+
+    print(f"Estimated irreversibility with GroupKFold: {irreversibility_value}")
     ```
     """
     
@@ -65,7 +72,6 @@ class IrreversibilityEstimator:
         self.verbose = verbose
         self.interaction_constraints = interaction_constraints
         self.random_state = random_state
-        self.kf = KFold(n_splits=self.n_splits, shuffle=True, random_state=self.random_state)
         
     def prepare_data(self, x_forward, x_backward=None):
         """
@@ -161,21 +167,27 @@ class IrreversibilityEstimator:
         model = self.train(x_forward, x_backward, train_index)
         return self.evaluate(model, x_forward, x_backward, test_index, return_log_diffs)
     
-    def fit_predict(self, x_forward, x_backward=None):
+    def fit_predict(self, x_forward, x_backward=None, groups=None):
         """
-        Performs k-fold cross-validation to estimate irreversibility.
+        Performs k-fold or group k-fold cross-validation to estimate irreversibility.
         
         Args:
         x_forward (ndarray): Encodings of the forward trajectories.
         x_backward (ndarray, optional): Encodings of the backward trajectories. If None, it is computed by reversing x_forward along axis 1. Default is None.
+        groups (array-like, optional): Group labels for the samples used while splitting the dataset into train/test set. Default is None.
         
         Returns:
         float: Mean irreversibility over all folds.
         """
         x_forward, x_backward = self.prepare_data(x_forward, x_backward)
+        if groups is not None:
+            kf = GroupKFold(n_splits=self.n_splits)
+        else:
+            kf = KFold(n_splits=self.n_splits, shuffle=True, random_state=self.random_state)
+        
         D = np.zeros(self.n_splits)
         
-        for fold_idx, (train_index, test_index) in enumerate(self.kf.split(x_forward)):
+        for fold_idx, (train_index, test_index) in enumerate(kf.split(x_forward, groups=groups)):
             if self.verbose:
                 print(f"Processing fold {fold_idx + 1}/{self.n_splits}")
             D[fold_idx] = self.train_and_evaluate(x_forward, x_backward, train_index, test_index)
