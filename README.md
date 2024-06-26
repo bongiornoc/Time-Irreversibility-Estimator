@@ -97,15 +97,15 @@ If you use this package in your research, please cite our paper:
 @article{Pacini2024Irreversibility,
   title={Unveiling the Drivers of Irreversibility in Time Series via Machine Learning},
   author={Cristiano Pacini, Michele Vodret, Christian Bongiorno},
-  journal={Journal of Computational Finance},
+  journal={},
   year={2024},
-  volume={12},
-  pages={34-56},
+  volume={},
+  pages={},
 }
 ```
 
 ## Authors and Contributors
 
 - **Cristiano Pacini** 
-- **Michele Vodret**
-- **Christian Bongiorno** (code author)
+- **Michele Vodret** - Email: [mvodret@gmail.com](mailto:mvodret@gmail.com)
+- **Christian Bongiorno** (code author) - Email: [christian.bongiorno@centralesupelec.fr](mailto:christian.bongiorno@centralesupelec.fr)
