@@ -47,7 +47,7 @@ print(f"Estimated time irreversibility: {irreversibility_value}")
 
 # Example with GroupKFold
 groups = np.random.randint(0, 5, size=x_forward.shape[0])  # Example group indices (use a meaningful group assignment here)
-estimator = ie.IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
+estimator = ie.TimeIrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
 irreversibility_value = estimator.fit_predict(x_forward, x_backward, n_splits=5, groups=groups)
 
 print(f"Estimated time irreversibility with GroupKFold: {irreversibility_value}")
