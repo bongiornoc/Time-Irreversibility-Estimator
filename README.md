@@ -99,10 +99,10 @@ This package uses the following libraries:
 If you use this package in your research, please cite our paper:
 
 ```
-@article{Pacini2024Irreversibility,
+@article{Vodret2024Irreversibility,
   title={Unveiling the Drivers of Irreversibility in Time Series via Machine Learning},
   author={Michele Vodret, Cristiano Pacini, Christian Bongiorno},
-  journal={},
+  journal={In Preparation},
   year={2024},
   volume={},
   pages={},
