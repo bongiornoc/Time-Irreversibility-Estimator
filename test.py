@@ -2,7 +2,7 @@
 import irreversibility_estimator as ie
 import numpy as np
 
-estimator = ie.IrreversibilityEstimator(verbose=True)
+estimator = ie.IrreversibilityEstimator(n_estimators=1000,learning_rate=0.01,verbose=False)
 mean = 0.6
 std = 1
 x_forward = np.random.normal(mean,std,size=(10000,2))
@@ -10,13 +10,13 @@ x_backward = -x_forward[:,::-1]
 
 print(estimator.fit_predict(x_forward, x_backward))
 #expected KL divergence value
-print( x_forward.shape[1]*2*(mean/std)**2 )
+#print( x_forward.shape[1]*2*(mean/std)**2 )
 
-print(estimator.fit_predict(x_forward, return_log_diffs=True))
+#print(estimator.fit_predict(x_forward, return_log_diffs=True))
 
-groups = np.random.randint(0,6,10000)
-print(estimator.fit_predict(x_forward, x_backward, groups=groups))
+#groups = np.random.randint(0,6,10000)
+#print(estimator.fit_predict(x_forward, x_backward, groups=groups))
 
 
-x_forward = np.random.normal(mean,std,size=(1000))
-print(estimator.fit_predict(x_forward))
+#x_forward = np.random.normal(mean,std,size=(1000))
+#print(estimator.fit_predict(x_forward))

@@ -64,6 +64,7 @@ A class to estimate irreversibility in time series using gradient boosting class
 #### Attributes:
 - `max_depth` (int): Maximum depth of the trees in the gradient boosting model.
 - `n_estimators` (int): Number of trees in the gradient boosting model.
+- `learning_rate` (float): Step size shrinkage used in update of the gradient boosting model.
 - `early_stopping_rounds` (int): Number of rounds for early stopping.
 - `verbose` (bool): If True, print progress messages.
 - `interaction_constraints` (str): Constraints on interactions between features.

@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.model_selection import KFold, GroupKFold
 import xgboost as xgb
-import sys
+import warnings
 
 class IrreversibilityEstimator:
     """
@@ -50,13 +50,14 @@ class IrreversibilityEstimator:
     ```
     """
     
-    def __init__(self, max_depth=6, n_estimators=10000, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None):
+    def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None):
         """
         Initializes the IrreversibilityEstimator with specified parameters.
         
         Args:
         max_depth (int): Maximum depth of the trees in the gradient boosting model. Default is 6.
         n_estimators (int): Number of trees in the gradient boosting model. Default is 10000.
+        learning_rate (float): Step size shrinkage used in update of the gradient boosting model. Default is 0.3.
         early_stopping_rounds (int): Number of rounds for early stopping. Default is 10.
         verbose (bool): If True, print progress messages. Default is False.
         interaction_constraints (str, optional): Constraints on interactions between features in the form of a string. For example, '[[0, 1], [2, 3, 4]]' means that features 0 and 1 can interact with each other, and features 2, 3, and 4 can interact with each other. Default is None.
@@ -65,6 +66,7 @@ class IrreversibilityEstimator:
     
         self.max_depth = max_depth
         self.n_estimators = n_estimators
+        self.learning_rate = learning_rate
         self.early_stopping_rounds = early_stopping_rounds
         self.verbose = verbose
         self.interaction_constraints = interaction_constraints
@@ -109,6 +111,7 @@ class IrreversibilityEstimator:
         model = xgb.XGBClassifier(
             n_estimators=self.n_estimators,
             max_depth=self.max_depth,
+            learning_rate=self.learning_rate,
             interaction_constraints=self.interaction_constraints,
             early_stopping_rounds=self.early_stopping_rounds,
             random_state=self.random_state
@@ -121,11 +124,11 @@ class IrreversibilityEstimator:
             model.fit(X_train, y_train, verbose=self.verbose, eval_set=[(X_test, y_test)])
             # if the early stopping rounds are not reached, and the last iteration is equal the number of trees, write a warning
             if model.get_booster().num_boosted_rounds() == self.n_estimators:
-                sys.warn('Warning: early stopping rounds not reached. Consider increasing the number of trees.')
+                warnings.warn('Early stopping rounds not reached. Consider increasing the number of trees.')
         else:
             model.fit(X_train, y_train, verbose=self.verbose)
             # Warning that use xgboost without early stopping can lead to overfitting, say to specify the test set
-            sys.warn('Warning: early stopping rounds not specified. Consider specifying the test set for early stopping.')
+            warnings.warn('Early stopping rounds not specified. Consider specifying the test set for early stopping.')
 
         return model
     
