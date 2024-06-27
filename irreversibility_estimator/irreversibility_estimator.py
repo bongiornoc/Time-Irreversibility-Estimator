@@ -204,7 +204,7 @@ class IrreversibilityEstimator:
         
         for fold_idx, (train_index, test_index) in enumerate(kf):
             if self.verbose:
-                print(f"Processing fold {fold_idx + 1}/{self.n_splits}")
+                print(f"Processing fold {fold_idx + 1}/{n_splits}")
             if return_log_diffs:
                 D[fold_idx], log_diffs[test_index] = self._train_and_evaluate(x_forward, x_backward, train_index, test_index, return_log_diffs)
             else:

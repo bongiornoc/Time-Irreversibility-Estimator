@@ -2,11 +2,15 @@
 
 The `IrreversibilityEstimator` is a Python package designed to estimate irreversibility in time series using gradient boosting classification. This package leverages the power of `xgboost` to classify forward and backward trajectories, providing a measure of irreversibility.
 
+Certamente, basandomi sul paper e sul modello descritto, ecco alcune caratteristiche chiave che potrebbero essere incluse nella sezione "Key Features":
+
 ## Key Features
 
-- **Cross-Validation:** Utilizes k-fold cross-validation to ensure robust estimation.
-- **Customizable Model:** Allows customization of `xgboost` parameters, including maximum tree depth, number of estimators, and interaction constraints.
-- **Data Preparation:** Handles preparation of forward and backward datasets, including optional automatic generation of backward trajectories.
+- **Quantification of Irreversibility:** Measures the irreversibility in high-dimensional time series using a model-free, non-linear approach.
+- **Interaction Constraints:** Allows the specification of interaction constraints to explore the contribution of different feature interactions to irreversibility.
+- **Cross-Validation:** Implements k-fold and group k-fold cross-validation for a robust and reliable estimation.
+- **Trajectory Encoding:** Supports any encoding strategy for time series data allowing for ad-hoc hypothesis testing.
+
 
 ## Installation
 
@@ -96,7 +100,7 @@ If you use this package in your research, please cite our paper:
 ```
 @article{Pacini2024Irreversibility,
   title={Unveiling the Drivers of Irreversibility in Time Series via Machine Learning},
-  author={Cristiano Pacini, Michele Vodret, Christian Bongiorno},
+  author={Michele Vodret, Cristiano Pacini, Christian Bongiorno},
   journal={},
   year={2024},
   volume={},
