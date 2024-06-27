@@ -3,9 +3,9 @@ from sklearn.model_selection import KFold, GroupKFold
 import xgboost as xgb
 import warnings
 
-class IrreversibilityEstimator:
+class TimeIrreversibilityEstimator:
     """
-    A class to estimate irreversibility in time series using gradient boosting classification.
+    A class to estimate time irreversibility in time series using gradient boosting classification.
     
     Attributes:
     
@@ -19,11 +19,11 @@ class IrreversibilityEstimator:
     Methods:
     - train(self, x_forward_train, x_backward_train, x_forward_test=None, x_backward_test=None): Trains the model on the training set with optional test set early stopping and returns the trained model.
     - evaluate(self, model, x_forward, x_backward, return_log_diffs=False): Evaluates the model on some data and returns the irreversibility.
-    - fit_predict(self, x_forward, x_backward=None,n_splits=5, groups=None, return_log_diffs=False): Performs k-fold or group k-fold cross-validation to estimate irreversibility.
+    - fit_predict(self, x_forward, x_backward=None,n_splits=5, groups=None, return_log_diffs=False): Performs k-fold or group k-fold cross-validation to estimate time irreversibility.
     
     Example:
     ```python
-    import irreversibility_estimator as ie
+    import time_irreversibility_estimator as ie
     import numpy as np
 
     # Example forward data (encodings of forward trajectories)
@@ -36,23 +36,23 @@ class IrreversibilityEstimator:
     # This means that features 0 and 1 can interact with each other, and features 2, 3, and 4 can interact with each other.
     interaction_constraints = '[[0, 1], [2, 3, 4]]'
 
-    estimator = ie.IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
+    estimator = ie.TimeIrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
     irreversibility_value = estimator.fit_predict(x_forward, x_backward)
 
-    print(f"Estimated irreversibility: {irreversibility_value}")
+    print(f"Estimated time irreversibility: {irreversibility_value}")
 
     # Example with GroupKFold
     groups = np.random.randint(0, 5, size=x_forward.shape[0])  # Example group indices
-    estimator = ie.IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
+    estimator = ie.TimeIrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
     irreversibility_value = estimator.fit_predict(x_forward, x_backward, n_splits=5, groups=groups)
 
-    print(f"Estimated irreversibility with GroupKFold: {irreversibility_value}")
+    print(f"Estimated time irreversibility with GroupKFold: {irreversibility_value}")
     ```
     """
     
     def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None):
         """
-        Initializes the IrreversibilityEstimator with specified parameters.
+        Initializes the TimeIrreversibilityEstimator with specified parameters.
         
         Args:
         max_depth (int): Maximum depth of the trees in the gradient boosting model. Default is 6.
@@ -134,7 +134,7 @@ class IrreversibilityEstimator:
     
     def evaluate(self, model, x_forward, x_backward, return_log_diffs=False):
         """
-        Evaluates the model on the test set and returns the irreversibility.
+        Evaluates the model on the test set and returns the time irreversibility.
         
         Args:
         model: Any model compatible with the scikit-learn API.
@@ -143,7 +143,7 @@ class IrreversibilityEstimator:
         return_log_diffs (bool): If True, return the individual log differences of the probabilities. Default is False.
         
         Returns:
-        float: Calculated irreversibility for the test set.
+        float: Calculated time irreversibility for the test set.
         list: Individual log differences of the probabilities, if return_log_diffs is True.
         """
         y_test = np.r_[np.ones(len(x_forward)), np.zeros(len(x_backward))]
@@ -155,7 +155,7 @@ class IrreversibilityEstimator:
         irreversibility = log_diffs.mean()
         
         if self.verbose:
-            print(f"Irreversibility of the test set: {irreversibility}")
+            print(f"Time irreversibility of the test set: {irreversibility}")
 
         if return_log_diffs:
             return irreversibility, log_diffs
@@ -174,7 +174,7 @@ class IrreversibilityEstimator:
         return_log_diffs (bool): If True, return the individual log differences of the probabilities. Default is False.
         
         Returns:
-        float: Calculated irreversibility for the fold.
+        float: Calculated time irreversibility for the fold.
         list: Individual log differences of the probabilities, if return_log_diffs is True.
         """
         model = self.train(x_forward[train_index], x_backward[train_index], x_forward[test_index], x_backward[test_index])
@@ -182,7 +182,7 @@ class IrreversibilityEstimator:
     
     def fit_predict(self, x_forward, x_backward=None,n_splits=5, groups=None,return_log_diffs=False):
         """
-        Performs k-fold or group k-fold cross-validation to estimate irreversibility.
+        Performs k-fold or group k-fold cross-validation to estimate time irreversibility.
         
         Args:
         x_forward (ndarray): Encodings of the forward trajectories. 2-dimensional numpy array where axis 0 represents different trajectories and axis 1 represents the encoding dimension of each trajectory.
@@ -192,7 +192,7 @@ class IrreversibilityEstimator:
         return_log_diffs (bool): If True, return the individual log differences of the probabilities. Default is False.
         
         Returns:
-        float: Mean irreversibility over all folds.
+        float: Mean time irreversibility over all folds.
         array: Individual log differences of the probabilities, if return_log_diffs is True.
         """
         x_forward, x_backward = self._prepare_data(x_forward, x_backward)
@@ -214,7 +214,7 @@ class IrreversibilityEstimator:
                 D[fold_idx] = self._train_and_evaluate(x_forward, x_backward, train_index, test_index)
         
         if self.verbose:
-            print(f"Completed cross-validation with mean irreversibility: {D.mean()}")
+            print(f"Completed cross-validation with mean time irreversibility: {D.mean()}")
 
         if return_log_diffs:
             return D.mean(), log_diffs

@@ -1,12 +1,10 @@
-# Irreversibility Estimator
+# Time Irreversibility Estimator
 
-The `IrreversibilityEstimator` is a Python package designed to estimate irreversibility in time series using gradient boosting classification. This package leverages the power of `xgboost` to classify forward and backward trajectories, providing a measure of irreversibility.
-
-Certamente, basandomi sul paper e sul modello descritto, ecco alcune caratteristiche chiave che potrebbero essere incluse nella sezione "Key Features":
+The `TimeIrreversibilityEstimator` is a Python package designed to estimate time irreversibility in time series using gradient boosting classification. This package leverages the power of `xgboost` to classify forward and backward trajectories, providing a measure of time irreversibility.
 
 ## Key Features
 
-- **Quantification of Irreversibility:** Measures the irreversibility in high-dimensional time series using a model-free, non-linear approach.
+- **Quantification of Irreversibility:** Measures the time irreversibility in high-dimensional time series using a model-free, non-linear approach.
 - **Interaction Constraints:** Allows the specification of interaction constraints to explore the contribution of different feature interactions to irreversibility.
 - **Cross-Validation:** Implements k-fold and group k-fold cross-validation for a robust and reliable estimation.
 - **Trajectory Encoding:** Supports any encoding strategy for time series data allowing for ad-hoc hypothesis testing.
@@ -17,19 +15,19 @@ Certamente, basandomi sul paper e sul modello descritto, ecco alcune caratterist
 You can install the package via pip:
 
 ```bash
-pip install irreversibility_estimator
+pip install time_irreversibility_estimator
 ```
 
 ## Concept
 
-The method introduced in the accompanying paper, "Unveiling the Drivers of Irreversibility in Time Series via Machine Learning," leverages gradient boosting to quantify the irreversibility in high-dimensional time series. The approach rephrases the problem as a binary classification task where the direction of time (forward or backward) is to be determined. The irreversibility measure is derived from the classifier's performance, specifically from the average log differences of predicted probabilities for forward and backward trajectories.
+The method introduced in the accompanying paper, "Unveiling the Drivers of Irreversibility in Time Series via Machine Learning," leverages gradient boosting to quantify the time irreversibility in high-dimensional time series. The approach rephrases the problem as a binary classification task where the direction of time (forward or backward) is to be determined. The time irreversibility measure is derived from the classifier's performance, specifically from the average log differences of predicted probabilities for forward and backward trajectories.
 
 ## Usage
 
 Below is an example of how to use the `IrreversibilityEstimator`:
 
 ```python
-import irreversibility_estimator as ie
+import time_irreversibility_estimator as ie
 import numpy as np
 
 # Example forward data (encodings of forward trajectories from a drifted 5-dimensional random-walk)
@@ -42,24 +40,24 @@ x_backward = -x_forward[:, ::-1]
 # This means that features 0 and 1 can interact with each other, and features 2, 3, and 4 can interact with each other.
 interaction_constraints = '[[0, 1], [2, 3, 4]]'
 
-estimator = ie.IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
+estimator = ie.TimeIrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
 irreversibility_value = estimator.fit_predict(x_forward, x_backward)
 
-print(f"Estimated irreversibility: {irreversibility_value}")
+print(f"Estimated time irreversibility: {irreversibility_value}")
 
 # Example with GroupKFold
 groups = np.random.randint(0, 5, size=x_forward.shape[0])  # Example group indices (use a meaningful group assignment here)
 estimator = ie.IrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
 irreversibility_value = estimator.fit_predict(x_forward, x_backward, n_splits=5, groups=groups)
 
-print(f"Estimated irreversibility with GroupKFold: {irreversibility_value}")
+print(f"Estimated time irreversibility with GroupKFold: {irreversibility_value}")
 ```
 
 ## Class Details
 
-### `IrreversibilityEstimator`
+### `TimeIrreversibilityEstimator`
 
-A class to estimate irreversibility in time series using gradient boosting classification.
+A class to estimate time irreversibility in time series using gradient boosting classification.
 
 #### Attributes:
 - `max_depth` (int): Maximum depth of the trees in the gradient boosting model.
@@ -73,7 +71,7 @@ A class to estimate irreversibility in time series using gradient boosting class
 #### Methods:
 - `train(self, x_forward_train, x_backward_train, x_forward_test=None, x_backward_test=None)`: Trains the model on the training set with optional test set early stopping and returns the trained model.
 - `evaluate(self, model, x_forward, x_backward, return_log_diffs=False)`: Evaluates the model on some data and returns the irreversibility.
-- `fit_predict(self, x_forward, x_backward=None, n_splits=5, groups=None, return_log_diffs=False)`: Performs k-fold or group k-fold cross-validation to estimate irreversibility.
+- `fit_predict(self, x_forward, x_backward=None, n_splits=5, groups=None, return_log_diffs=False)`: Performs k-fold or group k-fold cross-validation to estimate time irreversibility.
 
 ## License
 
