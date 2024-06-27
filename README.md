@@ -24,7 +24,7 @@ The method introduced in the accompanying paper, "Unveiling the Drivers of Irrev
 
 ## Usage
 
-Below is an example of how to use the `IrreversibilityEstimator`:
+Below is an example of how to use the `TimeIrreversibilityEstimator`:
 
 ```python
 import time_irreversibility_estimator as ie
