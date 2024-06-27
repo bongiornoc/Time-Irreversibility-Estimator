@@ -79,11 +79,11 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contributing
 
-Contributions are welcome! If you would like to contribute to the code or to request a new feature, please contact christian.bongiorno@centralesupelec.fr.
+Contributions are welcome! If you would like to contribute to the code or to request a new feature, please contact [christian.bongiorno@centralesupelec.fr](mailto:christian.bongiorno@centralesupelec.fr).
 
 ## Contact
 
-If you have any questions or feedback, please contact Christian Bongiorno at christian.bongiorno@centralesupelec.fr or Michele Vodret at mvodret@gmail.com.
+If you have any questions or feedback, please contact Christian Bongiorno at [christian.bongiorno@centralesupelec.fr](mailto:christian.bongiorno@centralesupelec.fr) or Michele Vodret at [mvodret@gmail.com](mailto:mvodret@gmail.com).
 
 ## Acknowledgements
 
