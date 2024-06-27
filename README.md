@@ -88,9 +88,9 @@ If you have any questions or feedback, please contact Christian Bongiorno at chr
 ## Acknowledgements
 
 This package uses the following libraries:
-- `numpy`
-- `scikit-learn`
-- `xgboost`
+- `numpy`>=2.0.0
+- `scikit-learn`>=1.5.0
+- `xgboost`>=1.5.0
 
 ## Citation
 
