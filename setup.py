@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='time_irreversibility_estimator',
-    version='0.2.4-alpha',
+    version='0.2.5-alpha',
     packages=find_packages(),
     install_requires=[
         'numpy>=2.0.0',
@@ -20,5 +20,5 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.11',
 )
