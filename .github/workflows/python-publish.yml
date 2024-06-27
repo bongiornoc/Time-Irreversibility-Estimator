@@ -6,21 +6,6 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-Publishing to PyPI
-You can configure your workflow to publish your Python package to PyPI once your CI tests pass. This section demonstrates how you can use GitHub Actions to upload your package to PyPI each time you publish a release. For more information, see "Managing releases in a repository."
-
-The example workflow below uses Trusted Publishing to authenticate with PyPI, eliminating the need for a manually configured API token.
-
-YAML
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-# GitHub recommends pinning actions to a commit SHA.
-# To get a newer version, you will need to update the SHA.
-# You can also reference a tag or branch, but the action may change without warning.
-
 name: Upload Python Package
 
 on:
