@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='time_irreversibility_estimator',
-    version='0.2.6-alpha',
+    version='0.2.7-alpha',
     packages=find_packages(),
     install_requires=[
         'numpy>=2.0.0',
