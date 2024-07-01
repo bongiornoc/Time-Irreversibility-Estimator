@@ -70,7 +70,7 @@ class TimeIrreversibilityEstimator:
     ```
     """
 
-    def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None, store=False):
+    def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None, store=False,**kwargs):
         """
         Initializes the TimeIrreversibilityEstimator with specified parameters.
         
@@ -92,6 +92,8 @@ class TimeIrreversibilityEstimator:
             Seed for random number generator. Default is None.
         store : bool, optional
             If True, store the models, the encodings, the indices and the probabilities. Default is False.
+        kwargs : dict
+            Additional parameters to be passed to the XGBoost classifier.
         """
         self.max_depth = max_depth
         self.n_estimators = n_estimators
@@ -101,6 +103,7 @@ class TimeIrreversibilityEstimator:
         self.interaction_constraints = interaction_constraints
         self.random_state = random_state
         self.store = store
+        self.kwargs = kwargs
 
     def _prepare_data(self, q_forward=None, x_forward=None, x_backward=None, encoding_fun=None):
         """
@@ -198,7 +201,8 @@ class TimeIrreversibilityEstimator:
             learning_rate=self.learning_rate,
             interaction_constraints=self.interaction_constraints,
             early_stopping_rounds=self.early_stopping_rounds,
-            random_state=self.random_state
+            random_state=self.random_state,
+            **self.kwargs
         )
         model.base_score = 0.5
 
