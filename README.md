@@ -67,11 +67,13 @@ A class to estimate time irreversibility in time series using gradient boosting 
 - `verbose` (bool): If True, print progress messages.
 - `interaction_constraints` (str): Constraints on interactions between features.
 - `random_state` (int or None): Seed for random number generator.
+- `store` (bool): If True, store the models, the encodings, and the indices.
+
 
 #### Methods:
 - `train(self, x_forward_train, x_backward_train, x_forward_test=None, x_backward_test=None)`: Trains the model on the training set with optional test set early stopping and returns the trained model.
 - `evaluate(self, model, x_forward, x_backward, return_log_diffs=False)`: Evaluates the model on some data and returns the irreversibility.
-- `fit_predict(self, x_forward, x_backward=None, n_splits=5, groups=None, return_log_diffs=False)`: Performs k-fold or group k-fold cross-validation to estimate time irreversibility.
+- `fit_predict(self, q_forward=None, x_forward=None, x_backward=None, encoding_fun=None, n_splits=5, groups=None)`: Performs k-fold or group k-fold cross-validation to estimate time irreversibility.
 
 ## License
 
