@@ -30,25 +30,25 @@ Below is an example of how to use the `TimeIrreversibilityEstimator`:
 import time_irreversibility_estimator as ie
 import numpy as np
 
-# Example forward data (encodings of forward trajectories from a drifted 5-dimensional random-walk)
-x_forward = np.random.normal(0.6, 1, size=(10000, 5))
+# Example forward forward trajectories
+q_forward = np.random.normal(0.6, 1, size=(10000, 6, 1)).cumsum(axis=1)
 
-# Example backward data (encodings of backward trajectories), optional
-x_backward = -x_forward[:, ::-1]
+# Example of encoding function
+encoding_fun = lambda x: np.diff(x, axis=0)
 
 # Example interaction constraints: '[[0, 1], [2, 3, 4]]'
 # This means that features 0 and 1 can interact with each other, and features 2, 3, and 4 can interact with each other.
 interaction_constraints = '[[0, 1], [2, 3, 4]]'
 
 estimator = ie.TimeIrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
-irreversibility_value = estimator.fit_predict(x_forward, x_backward)
+irreversibility_value = estimator.fit_predict(q_forward=q_forward, encoding_fun=encoding_fun)
 
 print(f"Estimated time irreversibility: {irreversibility_value}")
 
 # Example with GroupKFold
-groups = np.random.randint(0, 5, size=x_forward.shape[0])  # Example group indices (use a meaningful group assignment here)
+groups = np.random.randint(0, 5, size=q_forward.shape[0])  # Example group indices
 estimator = ie.TimeIrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
-irreversibility_value = estimator.fit_predict(x_forward, x_backward, n_splits=5, groups=groups)
+irreversibility_value = estimator.fit_predict(q_forward=q_forward, n_splits=5, groups=groups, encoding_fun=encoding_fun)
 
 print(f"Estimated time irreversibility with GroupKFold: {irreversibility_value}")
 ```
