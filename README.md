@@ -67,6 +67,7 @@ A class to estimate time irreversibility in time series using gradient boosting 
 - `interaction_constraints` (str): Constraints on interactions between features.
 - `random_state` (int or None): Seed for random number generator.
 - `store` (bool): If True, store the models, the encodings, the indices, the probabilities, and the individual irreversibility values.
+- `kwargs` (dict): Additional parameters to be passed to the XGBoost classifier
 
 #### Methods:
 - `train(self, x_forward_train, x_backward_train, x_forward_test=None, x_backward_test=None)`: Trains the model on the training set with optional test set early stopping and returns the trained model.

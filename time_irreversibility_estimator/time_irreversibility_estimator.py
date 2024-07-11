@@ -52,9 +52,6 @@ class TimeIrreversibilityEstimator:
     # Example of encoding function
     encoding_fun = lambda x: np.diff(x,axis=0)
 
-    # Example backward data (encodings of backward trajectories), optional
-    x_backward = -x_forward[:, ::-1]
-
     # Example interaction constraints: '[[0, 1], [2, 3, 4]]'
     interaction_constraints = '[[0, 1], [2, 3, 4]]'
 
@@ -71,7 +68,8 @@ class TimeIrreversibilityEstimator:
     print(f"Estimated time irreversibility with GroupKFold: {irreversibility_value}")
     ```
 
-    **Citation:**
+    Citation:
+    ---------
     If you use this package in your research, please cite our paper:
 
     ```
@@ -152,9 +150,9 @@ class TimeIrreversibilityEstimator:
                 warnings.warn('If q_forward is provided, both x_forward and x_backward will be ignored.')
             if encoding_fun is None:
                 encoding_fun = lambda x: x.flatten()
-            x_forward = np.vectorize(encoding_fun, signature='(n,m)->(k)')(q_forward)
+            x_forward = np.vectorize(encoding_fun, signature='(n,m)->(k,1)')(q_forward).reshape(q_forward.shape[0], -1)
             q_backward = q_forward[:, ::-1]
-            x_backward = np.vectorize(encoding_fun, signature='(n,m)->(k)')(q_backward)
+            x_backward = np.vectorize(encoding_fun, signature='(n,m)->(k,1)')(q_backward).reshape(q_backward.shape[0], -1)
         elif (x_backward is None) or (x_forward is None):
             raise ValueError("Either q_forward or x_forward and x_backward should be provided.")
         else:
