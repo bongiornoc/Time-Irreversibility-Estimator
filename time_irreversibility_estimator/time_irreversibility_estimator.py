@@ -24,7 +24,9 @@ class TimeIrreversibilityEstimator:
     random_state : int or None
         Seed for random number generator. Default is None.
     store : bool
-        If True, store the models, the encodings, and the indices. Default is False.
+        If True, store the models, the encodings, the indices, the probabilities, and the individual irreversibility values. Default is False.
+    kwargs : dict
+        Additional parameters to be passed to the XGBoost classifier
 
     Methods:
     --------
@@ -33,7 +35,7 @@ class TimeIrreversibilityEstimator:
         Trains the model on the training set and returns the trained model.
     
     evaluate(self, model, x_forward, x_backward)
-        Evaluates the model on the test set and returns the time irreversibility.
+        Evaluates the model on the test set and returns the time irreversibility and individual log differences of the probabilities.
     
     fit_predict(self, q_forward=None, x_forward=None, x_backward=None, encoding_fun=lambda x: x.flatten(), n_splits=5, groups=None)
         Performs k-fold or group k-fold cross-validation to estimate time irreversibility.
@@ -64,13 +66,25 @@ class TimeIrreversibilityEstimator:
     # Example with GroupKFold
     groups = np.random.randint(0, 5, size=q_forward.shape[0])  # Example group indices
     estimator = TimeIrreversibilityEstimator(interaction_constraints=interaction_constraints, verbose=True, random_state=0)
-    irreversibility_value = estimator.fit_predict(q_forward , n_splits=5, groups=groups, encoding_fun=encoding_fun)
+    irreversibility_value = estimator.fit_predict(q_forward, n_splits=5, groups=groups, encoding_fun=encoding_fun)
 
     print(f"Estimated time irreversibility with GroupKFold: {irreversibility_value}")
     ```
+
+    **Citation:**
+    If you use this package in your research, please cite our paper:
+
+    ```
+    @article{vodret2024functional,
+        title={Functional Decomposition and Estimation of Irreversibility in Time Series via Machine Learning},
+        author={Vodret, Michele and Pacini, Cristiano and Bongiorno, Christian},
+        journal={arXiv preprint arXiv:2407.06063},
+        year={2024}
+    }
+    ```
     """
 
-    def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None, store=False,**kwargs):
+    def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None, store=False, **kwargs):
         """
         Initializes the TimeIrreversibilityEstimator with specified parameters.
         
@@ -91,7 +105,7 @@ class TimeIrreversibilityEstimator:
         random_state : int or None, optional
             Seed for random number generator. Default is None.
         store : bool, optional
-            If True, store the models, the encodings, the indices and the probabilities. Default is False.
+            If True, store the models, the encodings, the indices, the probabilities, and the individual irreversibility values. Default is False.
         kwargs : dict
             Additional parameters to be passed to the XGBoost classifier.
         """
@@ -179,13 +193,18 @@ class TimeIrreversibilityEstimator:
         --------
         XGBClassifier
             Trained XGBoost model.
+
+        Raises:
+        -------
+        ValueError
+            If the input dimensions are incorrect or the number of trajectories does not match.
         """
         if len(x_forward_train.shape) != 2 or len(x_backward_train.shape) != 2 or (x_forward_test is not None and x_backward_test is not None and (len(x_forward_test.shape) != 2 or len(x_backward_test.shape) != 2)):
             raise ValueError("x_forward_train, x_backward_train, x_forward_test, and x_backward_test should be 2-dimensional.")
-        if (len(x_backward_train) != len(x_backward_train)):
+        if len(x_backward_train) != len(x_backward_train):
             raise ValueError("Number of forward and backward trajectories should be equal.")
         if x_forward_test is not None and x_backward_test is not None:
-            if (len(x_forward_test) != len(x_backward_test)):
+            if len(x_forward_test) != len(x_backward_test):
                 raise ValueError("Number of forward and backward trajectories in the test set should be equal.")
             
         y_train = np.r_[np.ones(len(x_forward_train)), np.zeros(len(x_backward_train))]
@@ -224,15 +243,15 @@ class TimeIrreversibilityEstimator:
 
     def evaluate(self, model, x_forward, x_backward):
         """
-        Evaluates the model on the test set and returns the time irreversibility.
+        Evaluates the model on the test set and returns the time irreversibility and individual log differences of the probabilities.
 
         Parameters:
         -----------
         model : XGBClassifier
             Trained XGBoost model.
-        x_forward : ndarray, 
+        x_forward : ndarray
             2-dimensional encodings of the forward trajectories. Axis 0 represents different trajectories and axis 1 represents the encoding dimension.
-        x_backward : ndarray, 
+        x_backward : ndarray
             2-dimensional encodings of the backward trajectories. Axis 0 represents different trajectories and axis 1 represents the encoding dimension.
 
         Returns:
@@ -241,9 +260,14 @@ class TimeIrreversibilityEstimator:
             Calculated time irreversibility for the test set.
         list
             Individual log differences of the probabilities.
+
+        Raises:
+        -------
+        ValueError
+            If the input dimensions are incorrect.
         """
         if len(x_forward.shape) != 2 or len(x_backward.shape) != 2:
-                raise ValueError("x_forward and x_backward should be 2-dimensional.")
+            raise ValueError("x_forward and x_backward should be 2-dimensional.")
         
         y_test = np.r_[np.ones(len(x_forward)), np.zeros(len(x_backward))]
         X_test = np.vstack((x_forward, x_backward))

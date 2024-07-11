@@ -9,7 +9,6 @@ The `TimeIrreversibilityEstimator` is a Python package designed to estimate time
 - **Cross-Validation:** Implements k-fold and group k-fold cross-validation for a robust and reliable estimation.
 - **Trajectory Encoding:** Supports any encoding strategy for time series data allowing for ad-hoc hypothesis testing.
 
-
 ## Installation
 
 You can install the package via pip:
@@ -20,7 +19,7 @@ pip install time_irreversibility_estimator
 
 ## Concept
 
-The method introduced in the accompanying paper, "Unveiling the Drivers of Irreversibility in Time Series via Machine Learning," leverages gradient boosting to quantify the time irreversibility in high-dimensional time series. The approach rephrases the problem as a binary classification task where the direction of time (forward or backward) is to be determined. The time irreversibility measure is derived from the classifier's performance, specifically from the average log differences of predicted probabilities for forward and backward trajectories.
+The method introduced in the accompanying paper, "Functional Decomposition and Estimation of Irreversibility in Time Series via Machine Learning", leverages gradient boosting to quantify the time irreversibility in high-dimensional time series. The approach rephrases the problem as a binary classification task where the direction of time (forward or backward) is to be determined. The time irreversibility measure is derived from the classifier's performance, specifically from the average log differences of predicted probabilities for forward and backward trajectories.
 
 ## Usage
 
@@ -30,7 +29,7 @@ Below is an example of how to use the `TimeIrreversibilityEstimator`:
 import time_irreversibility_estimator as ie
 import numpy as np
 
-# Example forward forward trajectories
+# Example forward trajectories
 q_forward = np.random.normal(0.6, 1, size=(10000, 6, 1)).cumsum(axis=1)
 
 # Example of encoding function
@@ -67,12 +66,11 @@ A class to estimate time irreversibility in time series using gradient boosting 
 - `verbose` (bool): If True, print progress messages.
 - `interaction_constraints` (str): Constraints on interactions between features.
 - `random_state` (int or None): Seed for random number generator.
-- `store` (bool): If True, store the models, the encodings, and the indices.
-
+- `store` (bool): If True, store the models, the encodings, the indices, the probabilities, and the individual irreversibility values.
 
 #### Methods:
 - `train(self, x_forward_train, x_backward_train, x_forward_test=None, x_backward_test=None)`: Trains the model on the training set with optional test set early stopping and returns the trained model.
-- `evaluate(self, model, x_forward, x_backward, return_log_diffs=False)`: Evaluates the model on some data and returns the irreversibility.
+- `evaluate(self, model, x_forward, x_backward)`: Evaluates the model on the test set and returns the time irreversibility and individual log differences of the probabilities.
 - `fit_predict(self, q_forward=None, x_forward=None, x_backward=None, encoding_fun=None, n_splits=5, groups=None)`: Performs k-fold or group k-fold cross-validation to estimate time irreversibility.
 
 ## License
@@ -99,13 +97,11 @@ This package uses the following libraries:
 If you use this package in your research, please cite our paper:
 
 ```
-@article{Vodret2024Irreversibility,
-  title={Unveiling the Drivers of Irreversibility in Time Series via Machine Learning},
-  author={Michele Vodret, Cristiano Pacini, Christian Bongiorno},
-  journal={In Preparation},
-  year={2024},
-  volume={},
-  pages={},
+@article{vodret2024functional,
+  title={Functional Decomposition and Estimation of Irreversibility in Time Series via Machine Learning},
+  author={Vodret, Michele and Pacini, Cristiano and Bongiorno, Christian},
+  journal={arXiv preprint arXiv:2407.06063},
+  year={2024}
 }
 ```
 
@@ -114,3 +110,4 @@ If you use this package in your research, please cite our paper:
 - **Cristiano Pacini** 
 - **Michele Vodret** - Email: [mvodret@gmail.com](mailto:mvodret@gmail.com)
 - **Christian Bongiorno** (code author) - Email: [christian.bongiorno@centralesupelec.fr](mailto:christian.bongiorno@centralesupelec.fr)
+```
