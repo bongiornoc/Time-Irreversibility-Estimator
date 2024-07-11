@@ -106,8 +106,7 @@ If you use this package in your research, please cite our paper:
 ```
 
 ## Authors and Contributors
-
-- **Cristiano Pacini** 
-- **Michele Vodret** - Email: [mvodret@gmail.com](mailto:mvodret@gmail.com)
 - **Christian Bongiorno** (code author) - Email: [christian.bongiorno@centralesupelec.fr](mailto:christian.bongiorno@centralesupelec.fr)
+- **Michele Vodret** - Email: [mvodret@gmail.com](mailto:mvodret@gmail.com)
+- **Cristiano Pacini** 
 ```
