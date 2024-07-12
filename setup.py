@@ -1,8 +1,13 @@
 from setuptools import setup, find_packages
+import sys
+
+# Check the Python version before proceeding with the setup
+if sys.version_info < (3, 10):
+    sys.exit('Python >= 3.10 is required. Your version is {}'.format(sys.version))
 
 setup(
     name='time_irreversibility_estimator',
-    version='0.4.1',
+    version='0.4.2',
     packages=find_packages(),
     install_requires=[
         'numpy>=2.0.0',
