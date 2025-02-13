@@ -7,7 +7,7 @@ if sys.version_info < (3, 10):
 
 setup(
     name='time_irreversibility_estimator',
-    version='0.4.2',
+    version='0.4.3',
     packages=find_packages(),
     install_requires=[
         'numpy>=2.0.0',

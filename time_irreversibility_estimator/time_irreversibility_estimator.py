@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.model_selection import KFold, GroupKFold
+from sklearn.model_selection import KFold, GroupKFold, train_test_split
 import xgboost as xgb
 import warnings
 
@@ -82,7 +82,8 @@ class TimeIrreversibilityEstimator:
     ```
     """
 
-    def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, interaction_constraints=None, random_state=None, store=False, **kwargs):
+    def __init__(self, max_depth=6, n_estimators=10000, learning_rate=0.3, early_stopping_rounds=10, verbose=False, 
+                 interaction_constraints=None, random_state=None, store=False, **kwargs):
         """
         Initializes the TimeIrreversibilityEstimator with specified parameters.
         
@@ -306,6 +307,35 @@ class TimeIrreversibilityEstimator:
         """
         model = self.train(x_forward[train_index], x_backward[train_index], x_forward[test_index], x_backward[test_index])
         return self.evaluate(model, x_forward[test_index], x_backward[test_index])
+    
+    def _train_evaluate_insample(self, x_forward, x_backward, test_size=0.2):
+        """
+        Trains the model on the training set and evaluates it on the test set.
+
+        Parameters:
+        -----------
+        x_forward : ndarray
+            Encodings of the forward trajectories.
+        x_backward : ndarray
+            Encodings of the backward trajectories.
+        test_size : float, optional
+            Fraction of the dataset to include in the test split. Default is 0.2.
+
+        Returns:
+        --------
+        float
+            Calculated time irreversibility for the test set.
+        list
+            Individual log differences of the probabilities.
+        """
+        
+        indices = np.arange(len(x_forward))
+        train_indices, test_indices = train_test_split(indices, test_size=test_size, random_state=self.random_state)
+        x_forward_train, x_forward_test = x_forward[train_indices], x_forward[test_indices]
+        x_backward_train, x_backward_test = x_backward[train_indices], x_backward[test_indices]
+
+        model = self.train(x_forward_train, x_backward_train, x_forward_test, x_backward_test)
+        return self.evaluate(model, x_forward_train, x_backward_train)
 
     def fit_predict(self, q_forward=None, x_forward=None, x_backward=None, encoding_fun=lambda x: x.flatten(), n_splits=5, groups=None):
         """
